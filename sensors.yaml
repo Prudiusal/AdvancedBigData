@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sensor-svc
+  namespace: time-series
+spec:
+  clusterIP: None
+  selector:
+    app: sensor
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sensor
+  namespace: time-series
+spec:
+  serviceName: sensor-svc
+  replicas: 5
+  selector:
+    matchLabels:
+      app: sensor
+  template:
+    metadata:
+      labels:
+	app: sensor
+    spec:
+      containers:
+      - name: sensor
+        image: node03.st:5000/timeseries-project/sensor:0.1
+        env:
+	    - name: GENERATE_DB
+          valueFrom:
+            configMapKeyRef:
+              name: sensor-conf
+              key: GENERATE_DB
+        - name: HISTORY_NUMBER_DB
+          valueFrom:
+            configMapKeyRef:
+              name: sensor-conf
+              key: HISTORY_NUMBER_DB
+        - name: PYTHONUNBUFFERED
+          valueFrom:
+            configMapKeyRef:
+              name: sensor-conf
+              key: PYTHONUNBUFFERED
+        - name: HIGH_FREQ
+          valueFrom:
+            configMapKeyRef:
+              name: sensor-conf
+              key: HIGH_FREQ
+
+      - name: producer
+        image: node03.st:5000/timeseries-project/producer:0.1
+        env:
+	    - name: BROKER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: sensor-conf
+              key: BROKER_HOST
+        - name: PYTHONUNBUFFERED
+          valueFrom:
+            configMapKeyRef:
+              name: sensor-conf
+              key: PYTHONUNBUFFERED
+
+

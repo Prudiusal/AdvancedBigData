@@ -1,0 +1,16 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sensor-conf
+  namespace: time-series
+  labels:
+    app: sensor
+data:
+  GENERATE_DB: "false"
+  BROKER_HOST: "10.128.125.159"
+  HISTORY_NUMBER_DB: "5080000"
+  PYTHONUNBUFFERED: "1"
+  HIGH_FREQ: "10000"
+
+
